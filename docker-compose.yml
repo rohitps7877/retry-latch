@@ -1,0 +1,40 @@
+services:
+
+  api1:
+    build: .
+    container_name: retrylatch-api1
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      SERVER_NAME: api1
+      REDIS_URL: redis://redis:6379
+
+  api2:
+    build: .
+    container_name: retrylatch-api2
+    ports:
+      - "3001:3000"
+    env_file:
+      - .env
+    environment:
+      SERVER_NAME: api2
+      REDIS_URL: redis://redis:6379
+
+  redis:
+    image: redis:latest
+    container_name: retrylatch-redis
+    ports:
+      - "6379:6379"
+
+  nginx:
+    image: nginx:latest
+    container_name: retrylatch-nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - api1
+      - api2
